@@ -111,6 +111,7 @@ async def on_message(message):
                 username = cur.fetchone()
                 if (username == None):
                     await message.channel.send("The student is not registered")
+                    return
                 logging.info(username[0])
                 cur.close()
                 await message.channel.send(username[0])
@@ -131,6 +132,7 @@ async def on_member_join(member):
     if (fullname == None):
         await member.send(str("For at få adgang til serveren skal du logge gennem følgende link: " + ssolink + authlink + base64.b64encode(str(member.id).encode('ascii')).decode("ascii")))
     else:
+        logging.info("Gave "+ fullname[0]+ " their old role back")
         roles = member.roles
         roles.append(role)
         try:
