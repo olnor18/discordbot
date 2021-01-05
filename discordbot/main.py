@@ -110,7 +110,7 @@ async def on_message(message):
                 logging.info("Executed")
                 username = cur.fetchone()
                 if (username == None):
-                    await message.channel.send("The user is not registered")
+                    await message.channel.send("The student is not registered")
                 logging.info(username[0])
                 cur.close()
                 await message.channel.send(username[0])
@@ -122,11 +122,21 @@ async def on_message(message):
 @client.event
 async def on_member_join(member):
     if (not member.guild.id == serverID):
-        print("Huh")
         return
     #clear = str(member.id).encode()
     #encrypted = f.encrypt(clear)
-    await member.send(str("For at få adgang til serveren skal du logge gennem følgende link: " + ssolink + authlink + base64.b64encode(str(member.id).encode('ascii')).decode("ascii")))
+    cur = conn.cursor()
+    cur.execute("SELECT fullname FROM users WHERE discordId = %s;", (str(member.id),))
+    fullname = cur.fetchone()
+    if (fullname == None):
+        await member.send(str("For at få adgang til serveren skal du logge gennem følgende link: " + ssolink + authlink + base64.b64encode(str(member.id).encode('ascii')).decode("ascii")))
+    else:
+        roles = member.roles
+        roles.append(role)
+        try:
+            await member.edit(nick=fullname[0], roles=roles)
+        except discord.errors.Forbidden:
+            logging.error('Missing permissions! Check the if the role is higher than the bot role or if the user is admin')
 
 def truncate_middle(s, n):
     if len(s) <= n:
@@ -173,7 +183,7 @@ async def addUser(username, fullname, discordId):
             logging.info("After member.edit")
             return True
         except discord.errors.Forbidden:
-            print('Missing permissions! Check the if the role is higher than the bot role or if the user is admin')
+            logging.error('Missing permissions! Check the if the role is higher than the bot role or if the user is admin')
     else:
         return "Du er ikke medlem af serveren"
 
