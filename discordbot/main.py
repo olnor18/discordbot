@@ -109,6 +109,8 @@ async def on_message(message):
                 cur.execute("SELECT username FROM users WHERE discordId = %s;", (arg,))
                 logging.info("Executed")
                 username = cur.fetchone()
+                if (username == None):
+                    await message.channel.send("The user is not registered")
                 logging.info(username[0])
                 cur.close()
                 await message.channel.send(username[0])
