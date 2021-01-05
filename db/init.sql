@@ -1,0 +1,1 @@
+CREATE TABLE IF NOT EXISTS users (username VARCHAR PRIMARY KEY, fullname VARCHAR, discordId VARCHAR);
