@@ -17,7 +17,7 @@ services:
      env_file: 
       - ./discordbot/.env
      environment:
-      AUTHLINK: "http://localhost/"
+      AUTHLINK: "http://db.nordestgaard.org/"
       DBPASS: passwørd1234
 volumes:
     db_data: {}

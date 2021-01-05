@@ -124,7 +124,7 @@ async def on_member_join(member):
         return
     #clear = str(member.id).encode()
     #encrypted = f.encrypt(clear)
-    await member.send(str("For at få adgang til serveren skal du logge gennem følgende link: " + ssolink + authlink + base64.b64encode(member.id).decode("ascii")))
+    await member.send(str("For at få adgang til serveren skal du logge gennem følgende link: " + ssolink + authlink + base64.b64encode(str(member.id)).decode("ascii")))
 
 def truncate_middle(s, n):
     if len(s) <= n:
