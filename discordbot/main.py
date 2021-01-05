@@ -91,23 +91,17 @@ async def on_message(message):
     if message.guild or message.author == client.user:
         return
     if message.channel.id == message.author.dm_channel.id and message.content.startswith('!username'):
-        logging.info("Got a hit!")
         arg = message.content.split()[1]
         server = client.get_guild(serverID)
         member = server.get_member(message.author.id)
-        logging.info("Done fetching")
         if member is not None:
-            logging.info("Is a member")
             isAllowed = False
             for adminRole in adminRoles:
                 if adminRole in member.roles:
                     isAllowed = True
             if isAllowed:
-                logging.info("Is allowed")
                 cur = conn.cursor()
-                logging.info("Created cursor")
                 cur.execute("SELECT username FROM users WHERE discordId = %s;", (arg,))
-                logging.info("Executed")
                 username = cur.fetchone()
                 if (username == None):
                     await message.channel.send("The student is not registered")
@@ -115,6 +109,24 @@ async def on_message(message):
                 logging.info(username[0])
                 cur.close()
                 await message.channel.send(username[0])
+            else:
+                await message.channel.send("You are not allowed to use that command")
+        else:
+            await message.channel.send("You are not allowed to use that command")
+    elif message.channel.id == message.author.dm_channel.id and message.content.startswith('!clearfromdb'):
+        arg = message.content.split()[1]
+        server = client.get_guild(serverID)
+        member = server.get_member(message.author.id)
+        if member is not None:
+            isAllowed = False
+            for adminRole in adminRoles:
+                if adminRole in member.roles:
+                    isAllowed = True
+            if isAllowed:
+                cur = conn.cursor()
+                cur.execute("DELETE FROM users WHERE discordId = %s;", (arg,))
+                cur.commit()
+                cur.close()
             else:
                 await message.channel.send("You are not allowed to use that command")
         else:
