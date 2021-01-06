@@ -24,9 +24,9 @@ app = Flask(__name__)
 
 intents = discord.Intents(messages=True, guilds=True, members=True)
 client = discord.Client(intents=intents)
-serverID = 795679940740907089 #786173237293875271
-roleID = 795680059758477333 #Not valid!!!!
-adminRoleIds = [796105678329479168]
+serverID = 786173237293875271
+roleID = 796342859602591755
+adminRoleIds = [786173939638468678, 786173757814996992]
 adminRoles = []
 
 ssolink = "https://sso.sdu.dk/login?service="
