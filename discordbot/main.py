@@ -142,7 +142,7 @@ async def on_member_join(member):
     cur.execute("SELECT fullname FROM users WHERE discordId = %s;", (str(member.id),))
     fullname = cur.fetchone()
     if (fullname == None):
-        await member.send(str("For at få adgang til serveren skal du logge gennem følgende link: " + ssolink + authlink + base64.b64encode(str(member.id).encode('ascii')).decode("ascii")))
+        await member.send(str("For at få adgang til serveren skal du logge gennem følgende link: " + authlink + base64.b64encode(str(member.id).encode('ascii')).decode("ascii"))) #+ ssolink + authlink + base64.b64encode(str(member.id).encode('ascii')).decode("ascii")))
     else:
         logging.info("Gave "+ fullname[0]+ " their old role back")
         roles = member.roles
@@ -205,7 +205,11 @@ async def addUser(username, fullname, discordId):
 ##########FLASK############
 ###########################
 
-@app.route('/<encryptedDiscordId>')
+@app.route('/<discordId>')
+def home(discordId):
+    return render_template("index.html", url = ssolink + authlink + "login/" + discordId)
+
+@app.route('/login/<encryptedDiscordId>')
 def validate(encryptedDiscordId):
     #discordId = f.decrypt(base64.b64decode(encryptedDiscordId)).decode('ascii')
     discordId = base64.b64decode(encryptedDiscordId).decode('ascii')
@@ -227,7 +231,7 @@ def validate(encryptedDiscordId):
 
 
 def getData(discordId, encryptedDiscordId, ticket):
-    response = requests.get(url = ssoverify, params = {'service':authlink+encryptedDiscordId, 'ticket': ticket})
+    response = requests.get(url = ssoverify, params = {'service':authlink+"login/"+encryptedDiscordId, 'ticket': ticket})
     tree = ElementTree.fromstring(response.content)
     ns = {"cas": "http://www.yale.edu/tp/cas"}
     if tree.find("cas:authenticationFailure", namespaces=ns) is not None:

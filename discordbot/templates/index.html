@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<body>
+<head>
+    <title>Data Management Discord Auth</title>
+</head>
+<div class="wrapper">
+    <div id="panel" class="panel-container">
+        <h1>
+            Verificer din Discord bruger
+        </h1>
+        <p>
+            For at få adgang til serveren, skal du logge ind gennem SDU's SSO. 
+        </p>
+        <button onclick="location.href='{{url}}'" class="button" type="button">
+            Login
+        </button>
+    </div>
+
+    <div id="faq" class="faq-container">
+        <button class="accordion">Er dette sikkert?</button>
+        <div class="panel">
+        <p>Ja! Vi håndterre ikke jeres adgangskode i systemet, da I logger ind på denne hjemmeside igennem https://sso.sdu.dk. I giver bare vores systemet adgang til jeres fulde navn og SDU brugernavn.</p>
+        </div>
+        
+        <button class="accordion">Hvorfor er dette nødvendigt?</button>
+        <div class="panel">
+        <p>Det er det fordi vi ønsker at alle på serveren bruger deres rigtige navne, samt for at sikre at det kun er studerende der kan tilgå serveren.</p>
+        </div>
+        
+        <button class="accordion">Hvordan virker det?</button>
+        <div class="panel">
+        <p>Når I klikker på login knappen bliver I ført til https://sso.sdu.dk som enten beder jer om at logge ind, eller klarer det automatisk hvis man allerede er logget ind på SSO. Vi får så en bekræftelse, hvor vi gemmer jeres SDU brugernavn, fulde navn og Discord ID. I bliver så tildelt den korrekte rolle på serveren og får ændret jeres Nickname.</p>
+        </div> 
+    </div>
+</div>
+
+<style>
+@import url('https://fonts.googleapis.com/css?family=Muli&display=swap');
+@import url('https://fonts.googleapis.com/css?family=Monserrat&display=swap');
+
+* {
+    box-sizing: border-box;
+}
+
+.button {
+    background-color:  #eee;
+    height: 3em;
+    border: none;
+    color: black;
+    width: 8em;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.button:hover {
+    background-color: #ccc;
+}
+
+body {
+    background-color: #FEF9F2;
+    font-family: 'Monserrat', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.wrapper {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    max-width: 35vw;
+    min-width: 35vw;
+    background-color: white;
+}
+
+.panel-container {
+    background-color: #fff;
+    border-radius: 4px;
+    font-size: 90%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 30px;
+    max-width: 35vw;
+    text-align: center;
+}
+
+.panel-container strong {
+    line-height: 20px;
+}
+    
+.panel-container p {
+    margin: 25px 0;
+    line-height: 20px;
+}
+    
+.ratings-container {
+    display: flex;
+    margin: 20px 0;
+}
+
+
+.accordion {
+    background-color: #eee;
+    color: #444;
+    cursor: pointer;
+    padding: 18px;
+    width: 100%;
+    max-width: 35vw;
+    text-align: left;
+    border: none;
+    outline: none;
+    font-size: 90%;
+}
+
+.panel p {
+    font-size: 90%;
+}
+    
+.active, .accordion:hover {
+    background-color: #ccc;
+}
+    
+.panel {
+    padding: 0 18px;
+    background-color: white;
+    overflow: auto;
+    display: none;
+}
+
+.accordion:after {
+    content: '\02795'; /* Unicode character for "plus" sign (+) */
+    font-size: 13px;
+    color: #777;
+    float: right;
+    margin-left: 5px;
+}
+    
+.active:after {
+    content: "\2796"; /* Unicode character for "minus" sign (-) */
+}
+    
+</style>
+</body>
+
+<script>
+var acc = document.getElementsByClassName("accordion");
+var i;
+
+for (let i = 0; i < acc.length; i++) {
+  acc[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+
+    var panel = this.nextElementSibling;
+    if (panel.style.display === "inline-block") {
+      panel.style.display = "none";
+    } else {
+      panel.style.display = "inline-block";
+    }
+  });
+} 
+</script>
+</html>
