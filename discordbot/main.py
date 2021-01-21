@@ -10,6 +10,7 @@ import logging
 from flask import Flask, render_template, request
 from discord.ext.tasks import loop
 from discord.ext import commands
+import re
 
 import base64
 
@@ -142,7 +143,8 @@ async def on_member_join(member):
     cur.execute("SELECT fullname FROM users WHERE discordId = %s;", (str(member.id),))
     fullname = cur.fetchone()
     if (fullname == None):
-        await member.send(str("For at få adgang til serveren skal du logge gennem følgende link: " + authlink + base64.b64encode(str(member.id).encode('ascii')).decode("ascii"))) #+ ssolink + authlink + base64.b64encode(str(member.id).encode('ascii')).decode("ascii")))
+        await member.send(str("For at få adgang til serveren skal du logge gennem følgende link: " + authlink + base64.b64encode(str(member.id).encode('ascii')).decode("ascii")+ '?lang=da'))  #+ ssolink + authlink + base64.b64encode(str(member.id).encode('ascii')).decode("ascii")))
+        await member.send(str("To get access to the server, You have to log in through this link: " + authlink + base64.b64encode(str(member.id).encode('ascii')).decode("ascii").replace('+','-').replace('/','_')+ '?lang=en')) 
     else:
         logging.info("Gave "+ fullname[0]+ " their old role back")
         roles = member.roles
@@ -188,7 +190,7 @@ async def addUser(username, fullname, discordId):
     logging.info("All thing have been fetched and member")
     if (member is not None):
         if (role in member.roles):
-            return "Du er allerede logget ind. Kontakt en TA eller Teacher for hjælp"
+            return "Du er allerede logget ind. Kontakt en TA eller Teacher for hjælp.\n You are already logged in. Contact a TA or a Teacher for help."
         roles = member.roles
         roles.append(role)
         try:
@@ -199,7 +201,7 @@ async def addUser(username, fullname, discordId):
         except discord.errors.Forbidden:
             logging.error('Missing permissions! Check the if the role is higher than the bot role or if the user is admin')
     else:
-        return "Du er ikke medlem af serveren"
+        return "Du er ikke medlem af serveren.\n You are not a member of the server."
 
 ###########################
 ##########FLASK############
@@ -207,7 +209,10 @@ async def addUser(username, fullname, discordId):
 
 @app.route('/<discordId>')
 def home(discordId):
-    return render_template("index.html", url = ssolink + authlink + "login/" + discordId)
+    if bool(re.match('^[A-Za-z0-9-_=]+$', discordId)):
+        return render_template("index.html", url = ssolink + authlink + "login/" + discordId.replace('-', '+').replace('_', '/'), defaultLang = request.args.get('lang'))
+    else:
+        return render_template("error.html", response="Invalid discordId")
 
 @app.route('/login/<encryptedDiscordId>')
 def validate(encryptedDiscordId):
@@ -221,7 +226,7 @@ def validate(encryptedDiscordId):
     try:
         cur.execute("INSERT INTO users (username, fullname, discordId) VALUES (%s, %s, %s);", (user["username"], user["fullname"], discordId))
     except psycopg2.errors.UniqueViolation:
-        return render_template("error.html", response="Du er allerede logget ind. Kontakt en TA eller Teacher for hjælp")
+        return render_template("error.html", response="Du er allerede logget ind. Kontakt en TA eller Teacher for hjælp.\n You are already logged in. Contact a TA or a Teacher for help.")
     finally:
         conn.commit()
     cur.close()

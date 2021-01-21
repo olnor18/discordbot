@@ -2,15 +2,28 @@
 <html>
 <body>
 <head>
-    <title>Data Management Discord Auth</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha256-4+XzXVhsDmqanXGHaHvgh1gMQKX40OUvDEBTu8JcmNs=" crossorigin="anonymous"></script>
+    <title>SDU Discord Auth</title>
 </head>
+
+<div class="langmenu">
+    <button onclick="$('*:lang(en)').css('display', 'inherit'); $('*:lang(da)').css('display', 'none')">English</button>
+    <button onclick="$('*:lang(da)').css('display', 'inherit'); $('*:lang(en)').css('display', 'none')">Danish</button>
+</div>
+
 <div class="wrapper">
     <div id="panel" class="panel-container">
-        <h1>
+        <h1 lang="da">
             Verificer din Discord bruger
         </h1>
-        <p>
+        <h1 lang="en">
+            Verify your Discord user
+        </h1>
+        <p lang="da">
             For at få adgang til serveren, skal du logge ind gennem SDU's SSO. 
+        </p>
+        <p lang="en">
+            To get access to the server, you have to log in through SDU's SSO. 
         </p>
         <button onclick="location.href='{{url}}'" class="button" type="button">
             Login
@@ -18,20 +31,23 @@
     </div>
 
     <div id="faq" class="faq-container">
-        <button class="accordion">Er dette sikkert?</button>
+        <button class="accordion"><div lang="da">Er dette sikkert?</div><div lang="en">Is it safe?</div></button>
         <div class="panel">
-        <p>Ja! Vi håndterre ikke jeres adgangskode i systemet, da I logger ind på denne hjemmeside igennem https://sso.sdu.dk. I giver bare vores systemet adgang til jeres fulde navn og SDU brugernavn.</p>
+            <p lang="da" >Ja! Vi håndtere ikke jeres adgangskode i systemet, da I logger ind på denne hjemmeside igennem https://sso.sdu.dk. I giver bare vores systemet adgang til jeres fulde navn og SDU brugernavn.</p>
+            <p lang="en">Yes! We don't handle your passwords in the system, because you log in on this site through https://sso.sdu.dk. You just give our system access to your full name and SDU Username.</p>
         </div>
         
-        <button class="accordion">Hvorfor er dette nødvendigt?</button>
+        <button class="accordion"><div lang="da">Hvorfor er dette nødvendigt?</div><div lang="en">Why is this necessary</div></button>
         <div class="panel">
-        <p>Det er det fordi vi ønsker at alle på serveren bruger deres rigtige navne, samt for at sikre at det kun er studerende der kan tilgå serveren.</p>
+            <p lang="da">Det er det fordi vi ønsker at alle på serveren bruger deres rigtige navne, samt for at sikre at det kun er studerende der kan tilgå serveren.</p>
+            <p lang="en">It is necessary because we want everyone on the server to use their real names and to make certain that only students can join the server.</p>
         </div>
         
-        <button class="accordion">Hvordan virker det?</button>
+        <button class="accordion"><div lang="da">Hvordan virker det?</div><div lang="en">How does it work?</div></button>
         <div class="panel">
-        <p>Når I klikker på login knappen bliver I ført til https://sso.sdu.dk som enten beder jer om at logge ind, eller klarer det automatisk hvis man allerede er logget ind på SSO. Vi får så en bekræftelse, hvor vi gemmer jeres SDU brugernavn, fulde navn og Discord ID. I bliver så tildelt den korrekte rolle på serveren og får ændret jeres Nickname.</p>
-        </div> 
+            <p lang="da">Når I klikker på login knappen bliver I ført til https://sso.sdu.dk som enten beder jer om at logge ind, eller klarer det automatisk hvis man allerede er logget ind på SSO. Vi får så en bekræftelse, hvor vi gemmer jeres SDU brugernavn, fulde navn og Discord ID. I bliver så tildelt den korrekte rolle på serveren og får ændret jeres Nickname.</p>
+            <p lang="en">When you click on the login button, you will be redirected to https://sso.sdu.dk, which either asks you to log in, or does it automatically, if you are already logged in on SSO. We then get a confirmation, where we save your SDU Username, full name and Discord ID. You are then assigned with the correct role on the server and get your Nickname changed.</p>
+        </div>
     </div>
 </div>
 
@@ -43,6 +59,28 @@
     box-sizing: border-box;
 }
 
+
+*:lang(en) {
+    {% if defaultLang != 'en' %}
+    display: none;
+    {% else %}
+    display: inherit;
+    {% endif %}
+}
+
+*:lang(da) {
+    {% if defaultLang == 'en' %}
+    display: none;
+    {% else %}
+    display: inherit;
+    {% endif %}
+}
+
+.langmenu {
+    position:absolute;
+    top: 2vh;
+    right: 2vw;
+}
 .button {
     background-color:  #eee;
     height: 3em;
