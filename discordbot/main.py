@@ -126,7 +126,7 @@ async def on_message(message):
             if isAllowed:
                 cur = conn.cursor()
                 cur.execute("DELETE FROM users WHERE discordId = %s;", (arg,))
-                cur.commit()
+                conn.commit()
                 cur.close()
             else:
                 await message.channel.send("You are not allowed to use that command")

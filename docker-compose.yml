@@ -7,17 +7,38 @@ services:
        - db_data:/var/lib/postgresql
      environment:
        POSTGRES_PASSWORD: passwørd1234
+     networks:
+       - network2
 
    discordbot:
      depends_on:
        - db
      build: ./discordbot
-     ports:
-       - "80:80"
      env_file: 
       - ./discordbot/.env
      environment:
-      AUTHLINK: "http://db.nordestgaard.org/"
+      AUTHLINK: "https://datamanagement.tek.sdu.dk/"
       DBPASS: passwørd1234
+     networks:
+       - network1
+       - network2
+
+   nginx:
+     depends_on:
+      - discordbot
+     build: ./proxy
+     ports:
+      - "80:80"
+      - "443:443"
+     networks:
+       - network1
+     volumes:
+       -  ./proxy/certs:/etc/ssl/
+networks:
+  network1:
+    driver: "bridge"
+  network2:
+    driver: "bridge"
+
 volumes:
     db_data: {}

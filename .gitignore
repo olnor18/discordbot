@@ -1,3 +1,4 @@
 external/
 .vscode/
 discordbot/.env
+proxy/certs
