@@ -150,7 +150,7 @@ async def on_member_join(member):
         roles = member.roles
         roles.append(role)
         try:
-            await member.edit(nick=fullname[0], roles=roles)
+            await member.edit(nick=truncate_middle(fullname[0],32), roles=roles)
         except discord.errors.Forbidden:
             logging.error('Missing permissions! Check the if the role is higher than the bot role or if the user is admin')
 
