@@ -25,9 +25,9 @@ app = Flask(__name__)
 
 intents = discord.Intents(messages=True, guilds=True, members=True)
 client = discord.Client(intents=intents)
-serverID = 786173237293875271
-roleID = 796342859602591755
-adminRoleIds = [786173939638468678, 786173757814996992]
+serverID = 843840612414783518 #786173237293875271
+roleID = 875306998885924885 #796342859602591755
+adminRoleIds = [ 875306815594852353 ]#786173939638468678, 786173757814996992]
 adminRoles = []
 
 ssolink = "https://sso.sdu.dk/login?service="
@@ -71,8 +71,8 @@ async def updater():
     global updateQueue
     internalQueue = updateQueue
     for users in internalQueue:
-        logging.info(users["user"]["username"] + " logged in on the discord user: " + users["discordId"])
-        await addUser(users["user"]["username"], users["user"]["fullname"], users["discordId"])
+        #logging.info(users["user"]["username"] + " logged in on the discord user: " + users["discordId"])
+        await addUser( users["discordId"]) #users["user"]["username"], users["user"]["fullname"], users["discordId"])
         updateQueue.remove(users)
 
 role = None
@@ -91,7 +91,7 @@ async def on_ready():
 async def on_message(message):
     if message.guild or message.author == client.user:
         return
-    if message.channel.id == message.author.dm_channel.id and message.content.startswith('!username'):
+    '''if message.channel.id == message.author.dm_channel.id and message.content.startswith('!username'):
         arg = message.content.split()[1]
         server = client.get_guild(serverID)
         member = server.get_member(message.author.id)
@@ -114,7 +114,8 @@ async def on_message(message):
                 await message.channel.send("You are not allowed to use that command")
         else:
             await message.channel.send("You are not allowed to use that command")
-    elif message.channel.id == message.author.dm_channel.id and message.content.startswith('!clearfromdb'):
+    el'''
+    if message.channel.id == message.author.dm_channel.id and message.content.startswith('!clearfromdb'):
         arg = message.content.split()[1]
         server = client.get_guild(serverID)
         member = server.get_member(message.author.id)
@@ -140,17 +141,17 @@ async def on_member_join(member):
     #clear = str(member.id).encode()
     #encrypted = f.encrypt(clear)
     cur = conn.cursor()
-    cur.execute("SELECT fullname FROM users WHERE discordId = %s;", (str(member.id),))
-    fullname = cur.fetchone()
-    if (fullname == None):
-        await member.send(str("For at få adgang til serveren skal du logge gennem følgende link: " + authlink + base64.b64encode(str(member.id).encode('ascii')).decode("ascii")+ '?lang=da'))  #+ ssolink + authlink + base64.b64encode(str(member.id).encode('ascii')).decode("ascii")))
-        await member.send(str("To get access to the server, You have to log in through this link: " + authlink + base64.b64encode(str(member.id).encode('ascii')).decode("ascii").replace('+','-').replace('/','_')+ '?lang=en')) 
+    cur.execute("SELECT * FROM users WHERE discordId = %s;", (str(member.id),))
+    row = cur.fetchone()
+    if (row == None):
+        await member.send(str("For at få adgang til serveren skal du logge ind gennem følgende link: " + authlink + base64.b64encode(str(member.id).encode('ascii')).decode("ascii")+ '?lang=da eller spørge en admin om at verificere dig manuelt'))  #+ ssolink + authlink + base64.b64encode(str(member.id).encode('ascii')).decode("ascii")))
+        await member.send(str("To get access to the server, you have to log in through this link: " + authlink + base64.b64encode(str(member.id).encode('ascii')).decode("ascii").replace('+','-').replace('/','_')+ '?lang=en or ask an admin to manually verify you')) 
     else:
-        logging.info("Gave "+ fullname[0]+ " their old role back")
+        logging.info("Gave "+ str(member.id) + " their old role back")
         roles = member.roles
         roles.append(role)
         try:
-            await member.edit(nick=fullname[0], roles=roles)
+            await member.edit(roles=roles)
         except discord.errors.Forbidden:
             logging.error('Missing permissions! Check the if the role is higher than the bot role or if the user is admin')
 
@@ -179,23 +180,23 @@ def truncate_middle(s, n):
     else:
         return s[:n-3]+'...'
 
-async def addUser(username, fullname, discordId):
-    logging.info("Before anything")
-    realname = truncate_middle(fullname, 32)
-    logging.info("Before guild")
+async def addUser(discordId):
+    #logging.info("Before anything")
+    #realname = truncate_middle(fullname, 32)
+    #logging.info("Before guild")
     server = client.get_guild(serverID)
-    logging.info("Got Guild")
-    logging.info("Before member with id: "+str(int(discordId)))
+    #logging.info("Got Guild")
+    #logging.info("Before member with id: "+str(int(discordId)))
     member = server.get_member(int(str(discordId)))
     logging.info("All thing have been fetched and member")
     if (member is not None):
         if (role in member.roles):
-            return "Du er allerede logget ind. Kontakt en TA eller Teacher for hjælp.\n You are already logged in. Contact a TA or a Teacher for help."
+            return "Du er allerede logget ind. Kontakt en admin.\n You are already logged in. Contact an admin for help."
         roles = member.roles
         roles.append(role)
         try:
             logging.info("Before member.edit")
-            await member.edit(nick=realname, roles=roles)
+            await member.edit(roles=roles)
             logging.info("After member.edit")
             return True
         except discord.errors.Forbidden:
@@ -224,14 +225,14 @@ def validate(encryptedDiscordId):
         return render_template("error.html", response="Authentication Failure")
     cur = conn.cursor()
     try:
-        cur.execute("INSERT INTO users (username, fullname, discordId) VALUES (%s, %s, %s);", (user["username"], user["fullname"], discordId))
+        cur.execute("INSERT INTO users (discordId) VALUES (%s);", (discordId,))
     except psycopg2.errors.UniqueViolation:
-        return render_template("error.html", response="Du er allerede logget ind. Kontakt en TA eller Teacher for hjælp.\n You are already logged in. Contact a TA or a Teacher for help.")
+        return render_template("error.html", response="Du er allerede logget ind. Kontakt en admin for hjælp.\n You are already logged in. Contact an admin for help.")
     finally:
         conn.commit()
     cur.close()
     global updateQueue
-    updateQueue.append({"user": user, "discordId": discordId})
+    updateQueue.append({"discordId": discordId})
     return render_template("success.html")
 
 
@@ -243,13 +244,10 @@ def getData(discordId, encryptedDiscordId, ticket):
         return None
     elif tree.find("cas:authenticationSuccess", namespaces=ns) is not None:
         data = tree.find("cas:authenticationSuccess", namespaces=ns)
-        username = data.find("cas:user", namespaces=ns)
-        user = data.find("norEduPerson")
-        fullname = user.find("cn")
-        return {
-            "username": username.text,
-            "fullname": fullname.text
-        }
+        #username = data.find("cas:user", namespaces=ns)
+        #user = data.find("norEduPerson")
+        #fullname = user.find("cn")
+        return True
 
 
 ###########################
